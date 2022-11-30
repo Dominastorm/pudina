@@ -15,19 +15,15 @@ st.set_page_config(layout="wide")
 
 # Add a logo to the sidebar
 image = Image.open('assets/images/pudina.png')
-# Small logo for sidebar
 st.sidebar.image(image, use_column_width=True)
 
 # Add expander to provide app information
 expander = st.sidebar.expander("About")
-expander.write(
-    "This app is a project management dashboard that allows you to track your projects and tasks.")
+expander.write("This app is a project management dashboard that allows you to track your projects and tasks.")
 
-# Add a selectbox to the sidebar
-add_selectbox = st.sidebar.selectbox(
-    "How would you like to view the data?",
-    ("Dashboard", "Data")
-)
+# Add a selectbox to the sidebar:
+menu = ("Create", "Read", "Update", "Delete")
+choice = st.sidebar.selectbox("Menu", menu)
 
 
 # DASHBOARD
@@ -60,66 +56,73 @@ st.download_button(
     file_name='project_template.csv',
     mime='text/csv',
 )
-#Main interface section 2
+# Main interface section 2
 st.subheader('Step 2: Upload your project plan file')
-uploaded_file = st.file_uploader("Fill out the project plan template and upload your file here. After you upload the file, you can edit your project plan within the app.", type=['csv'])
+uploaded_file = st.file_uploader(
+    "Fill out the project plan template and upload your file here. After you upload the file, you can edit your project plan within the app.", type=['csv'])
 if uploaded_file is not None:
-    Tasks=pd.read_csv(uploaded_file)
+    Tasks = pd.read_csv(uploaded_file)
     Tasks['Start'] = Tasks['Start'].astype('datetime64')
     Tasks['Finish'] = Tasks['Finish'].astype('datetime64')
-    
+
     grid_response = AgGrid(
         Tasks,
-        editable=True, 
-        height=300, 
+        editable=True,
+        height=300,
         width='100%',
-        )
+    )
 
     updated = grid_response['data']
-    df = pd.DataFrame(updated) 
-    
-    #Main interface - section 3
+    df = pd.DataFrame(updated)
+
+    # Main interface - section 3
     st.subheader('Step 3: Generate the Gantt chart')
-    
-    Options = st.selectbox("View Gantt Chart by:", ['Team','Completion Pct'],index=0)
-    if st.button('Generate Gantt Chart'): 
+
+    Options = st.selectbox("View Gantt Chart by:", [
+                           'Team', 'Completion Pct'], index=0)
+    if st.button('Generate Gantt Chart'):
         fig = px.timeline(
-                        df, 
-                        x_start="Start", 
-                        x_end="Finish", 
-                        y="Task",
-                        color=Options,
-                        hover_name="Task Description"
-                        )
+            df,
+            x_start="Start",
+            x_end="Finish",
+            y="Task",
+            color=Options,
+            hover_name="Task Description"
+        )
 
-        fig.update_yaxes(autorange="reversed")          #if not specified as 'reversed', the tasks will be listed from bottom up       
-        
+        # if not specified as 'reversed', the tasks will be listed from bottom up
+        fig.update_yaxes(autorange="reversed")
+
         fig.update_layout(
-                        title='Project Plan Gantt Chart',
-                        hoverlabel_bgcolor='#DAEEED',   #Change the hover tooltip background color to a universal light blue color. If not specified, the background color will vary by team or completion pct, depending on what view the user chooses
-                        bargap=0.2,
-                        height=600,              
-                        xaxis_title="", 
-                        yaxis_title="",                   
-                        title_x=0.5,                    #Make title centered                     
-                        xaxis=dict(
-                                tickfont_size=15,
-                                tickangle = 270,
-                                rangeslider_visible=True,
-                                side ="top",            #Place the tick labels on the top of the chart
-                                showgrid = True,
-                                zeroline = True,
-                                showline = True,
-                                showticklabels = True,
-                                tickformat="%x\n",      #Display the tick labels in certain format. To learn more about different formats, visit: https://github.com/d3/d3-format/blob/main/README.md#locale_format
-                                )
-                    )
-        
-        fig.update_xaxes(tickangle=0, tickfont=dict(family='Rockwell', color='blue', size=15))
+            title='Project Plan Gantt Chart',
+            hoverlabel_bgcolor='#DAEEED',  # Change the hover tooltip background color to a universal light blue color. If not specified, the background color will vary by team or completion pct, depending on what view the user chooses
+            bargap=0.2,
+            height=600,
+            xaxis_title="",
+            yaxis_title="",
+                        title_x=0.5,  # Make title centered
+            xaxis=dict(
+                tickfont_size=15,
+                tickangle=270,
+                rangeslider_visible=True,
+                side="top",  # Place the tick labels on the top of the chart
+                showgrid=True,
+                zeroline=True,
+                showline=True,
+                showticklabels=True,
+                tickformat="%x\n",  # Display the tick labels in certain format. To learn more about different formats, visit: https://github.com/d3/d3-format/blob/main/README.md#locale_format
+            )
+        )
 
-        st.plotly_chart(fig, use_container_width=True)  #Display the plotly chart in Streamlit
+        fig.update_xaxes(tickangle=0, tickfont=dict(
+            family='Rockwell', color='blue', size=15))
 
-        st.subheader('Bonus: Export the interactive Gantt chart to HTML and share with others!') #Allow users to export the Plotly chart to HTML
+        # Display the plotly chart in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Allow users to export the Plotly chart to HTML
+        st.subheader(
+            'Bonus: Export the interactive Gantt chart to HTML and share with others!')
         buffer = io.StringIO()
         fig.write_html(buffer, include_plotlyjs='cdn')
         html_bytes = buffer.getvalue().encode()
@@ -128,9 +131,9 @@ if uploaded_file is not None:
             data=html_bytes,
             file_name='Gantt.html',
             mime='text/html'
-        ) 
+        )
     else:
-        st.write('---') 
-   
+        st.write('---')
+
 else:
     st.warning('You need to upload a csv file.')

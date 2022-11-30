@@ -12,7 +12,7 @@ def main() -> None:
     # Setting wide as the default layout
     st.set_page_config(layout="wide")
 
-    # SIDEBAR
+    # SIDEBAR 
     # Add a logo to the sidebar
     image = Image.open('assets/images/pudina.png')
     st.sidebar.image(image, use_column_width=True)
@@ -22,10 +22,13 @@ def main() -> None:
     expander.write("This app is a project management dashboard that allows you to track your projects and tasks.")
 
     # Add a selectbox to the sidebar:
-    menu = ("Create", "Read", "Update", "Delete")
+    menu = ("Add", "View", "Edit", "Delete")
     choice = st.sidebar.selectbox("Menu", menu)
 
-    
+    # MAIN
+    # Add a title to the main page
+    st.title("Project Management Dashboard")
+
 
 if __name__ == '__main__':
     main()
