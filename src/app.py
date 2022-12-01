@@ -7,10 +7,11 @@ from PIL import Image
 import io
 import yaml
 import streamlit_authenticator as stauth
+
 from yaml.loader import SafeLoader
 from helpers.query_execution import excecute_query
 
-from sql.database import create_tables
+from sql.create import create_tables
 
 def main() -> None:
     # Setting wide as the default layout
@@ -43,7 +44,7 @@ def main() -> None:
     # If the user is authenticated, display the app
     if authentication_status:
         # SIDEBAR
-        menu = ['Home', 'Execute Query', 'My Profile', 'Logout']
+        menu = ['Home', 'Execute Query', 'Logout']
         
         choice = st.sidebar.selectbox('Navigation Menu', menu, label_visibility = 'hidden')
         

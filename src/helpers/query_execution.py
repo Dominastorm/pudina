@@ -1,7 +1,13 @@
 import streamlit as st
 import pandas as pd
 import mysql.connector
-from sql.database import *
+
+from sql.create import *
+from sql.delete import *
+from sql.display import *
+from sql.update import *
+from sql.insert import *
+
 
 db = mysql.connector.connect(
     host='localhost',
@@ -13,7 +19,7 @@ db = mysql.connector.connect(
 cur = db.cursor()
 
 def preset_query():
-    operations = ["Insert", "Delete", "Update", "Display", "Search"]
+    operations = ["Insert", "Delete", "Update", "Display"]
     tables = ["User", "Project", "Task", "Comment"]
 
     operations_choice = st.selectbox("Operation", operations)
